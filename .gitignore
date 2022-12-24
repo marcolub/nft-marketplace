@@ -41,7 +41,6 @@ typechain
 
 #Hardhat files
 cache
-artifacts
 
 # Project
 /config.js
