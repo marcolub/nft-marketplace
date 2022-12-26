@@ -10,6 +10,7 @@ import Web3Provider from '../src/components/providers/Web3Provider'
 import { StylesProvider, createGenerateClassName } from '@mui/styles'
 import BaseLayout from '../src/components/layout/Base'
 import './Base.css'
+import './details.css'
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

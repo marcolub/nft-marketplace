@@ -10,6 +10,8 @@ import NFTPrice from '../atoms/NFTPrice'
 import NFTName from '../atoms/NFTName'
 import CardAddresses from './CardAddresses'
 import PriceTextField from '../atoms/PriceTextField'
+import { useRouter } from 'next/router';
+import { Details } from '@mui/icons-material'
 
 const useStyles = makeStyles({
   root: {
@@ -54,13 +56,13 @@ const useStyles = makeStyles({
   }
 })
 
-async function getAndSetListingFee (marketplaceContract, setListingFee) {
+async function getAndSetListingFee(marketplaceContract, setListingFee) {
   if (!marketplaceContract) return
   const listingFee = await marketplaceContract.getListingFee()
   setListingFee(ethers.utils.formatUnits(listingFee, 'ether'))
 }
 
-export default function NFTCard ({ nft, action, updateNFT }) {
+const NFTCard = ({ nft, action, updateNFT }) => {
   const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
   const { nftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
   const [isHovered, setIsHovered] = useState(false)
@@ -70,6 +72,8 @@ export default function NFTCard ({ nft, action, updateNFT }) {
   const [newPrice, setPrice] = useState(0)
   const classes = useStyles()
   const { name, description, image } = nft
+
+  const router = useRouter();
 
   useEffect(() => {
     getAndSetListingFee(marketplaceContract, setListingFee)
@@ -94,11 +98,11 @@ export default function NFTCard ({ nft, action, updateNFT }) {
     },
     none: {
       text: '',
-      method: () => {}
+      method: () => { }
     }
   }
 
-  async function buyNft (nft) {
+  async function buyNft(nft) {
     const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
     const transaction = await marketplaceContract.createMarketSale(nftContract.address, nft.marketItemId, {
       value: price
@@ -107,20 +111,20 @@ export default function NFTCard ({ nft, action, updateNFT }) {
     updateNFT()
   }
 
-  async function cancelNft (nft) {
+  async function cancelNft(nft) {
     const transaction = await marketplaceContract.cancelMarketItem(nftContract.address, nft.marketItemId)
     await transaction.wait()
     updateNFT()
   }
 
-  async function approveNft (nft) {
+  async function approveNft(nft) {
     const approveTx = await nftContract.approve(marketplaceContract.address, nft.tokenId)
     await approveTx.wait()
     updateNFT()
     return approveTx
   }
 
-  async function sellNft (nft) {
+  async function sellNft(nft) {
     if (!newPrice) {
       setPriceError(true)
       return
@@ -134,12 +138,21 @@ export default function NFTCard ({ nft, action, updateNFT }) {
     return transaction
   }
 
-  function handleCardImageClick () {
-    setModalNFT(nft)
-    setIsModalOpen(true)
+  function handleCardImageClick() {
+    // setModalNFT(nft)
+    // setIsModalOpen(true)
+    router.push({
+      pathname:'/details', 
+      query:{ 
+        name: nft.name,
+        description: nft.description,
+        tokenId: parseInt(nft.tokenId),
+        image: nft.image
+      }
+    })
   }
 
-  async function onClick (nft) {
+  async function onClick(nft) {
     try {
       setIsLoading(true)
       await actions[action].method(nft)
@@ -151,44 +164,46 @@ export default function NFTCard ({ nft, action, updateNFT }) {
   }
 
   return (
-    <Card
-      className={classes.root}
-      raised={isHovered}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      <Card
+        className={classes.root}
+        raised={isHovered}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
       >
-      <CardMedia
-        className={classes.media}
-        alt={name}
-        image={image}
-        component="a" onClick={handleCardImageClick}
-      />
+        <CardMedia
+          className={classes.media}
+          alt={name}
+          image={image}
+          component="a" onClick={handleCardImageClick}
+        />
 
-      <CardContent className={classes.cardContent} >
-        <NFTName name={name}/>
-        <NFTDescription description={description} />
-        <Divider className={classes.firstDivider} />
-        <Box className={classes.addressesAndPrice}>
-          <div className={classes.addessesContainer}>
-            <CardAddresses nft={nft} />
-          </div>
-          <div className={classes.priceContainer}>
-            {action === 'sell'
-              ? <PriceTextField listingFee={listingFee} error={priceError} disabled={isLoading} onChange={e => setPrice(e.target.value)}/>
-              : <NFTPrice nft={nft}/>
+        <CardContent className={classes.cardContent} >
+          <NFTName name={name} />
+          <NFTDescription description={description} />
+          <Divider className={classes.firstDivider} />
+          <Box className={classes.addressesAndPrice}>
+            <div className={classes.addessesContainer}>
+              <CardAddresses nft={nft} />
+            </div>
+            <div className={classes.priceContainer}>
+              {action === 'sell'
+                ? <PriceTextField listingFee={listingFee} error={priceError} disabled={isLoading} onChange={e => setPrice(e.target.value)} />
+                : <NFTPrice nft={nft} />
+              }
+            </div>
+          </Box>
+          <Divider className={classes.lastDivider} />
+        </CardContent>
+        <CardActions className={classes.cardActions}>
+          <Button size="small" onClick={() => !isLoading && onClick(nft)}>
+            {isLoading
+              ? <CircularProgress size="20px" />
+              : hasWeb3 && actions[action].text
             }
-          </div>
-        </Box>
-        <Divider className={classes.lastDivider} />
-      </CardContent>
-      <CardActions className={classes.cardActions}>
-        <Button size="small" onClick={() => !isLoading && onClick(nft)}>
-          {isLoading
-            ? <CircularProgress size="20px" />
-            : hasWeb3 && actions[action].text
-          }
-        </Button>
-      </CardActions>
-    </Card>
+          </Button>
+        </CardActions>
+      </Card>
   )
 }
+
+export default NFTCard
