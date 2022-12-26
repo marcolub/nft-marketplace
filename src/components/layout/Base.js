@@ -1,17 +1,16 @@
-import { useContext } from 'react'
-import LowOnBalanceTip from '../molecules/LowOnBalanceTip'
-import NFTModal from '../organisms/NFTModal'
-import NFTModalProvider from '../providers/NFTModalProvider'
-import { Web3Context } from '../providers/Web3Provider'
-import { Breadcrumb, Layout, Menu, theme } from 'antd';
+import { useContext } from 'react';
+import LowOnBalanceTip from '../molecules/LowOnBalanceTip';
+import NFTModal from '../organisms/NFTModal';
+import NFTModalProvider from '../providers/NFTModalProvider';
+import { Web3Context } from '../providers/Web3Provider';
+import { Breadcrumb, Layout, Menu } from 'antd';
 import React, { useState } from 'react';
 import {
   DesktopOutlined,
   PieChartOutlined,
-  UserOutlined,
 } from '@ant-design/icons';
-import Image from 'next/image'
-import logo from './img/logo.png'
+import Image from 'next/image';
+import logo from './img/logo.png';
 
 const { Content, Sider } = Layout;
 
@@ -21,7 +20,7 @@ export default function BaseLayout({ children }) {
 
   const [collapsed, setCollapsed] = useState(true);
 
-  const { account } = useContext(Web3Context)
+  const { account } = useContext(Web3Context);
 
   const giveMenu = () => {
     
