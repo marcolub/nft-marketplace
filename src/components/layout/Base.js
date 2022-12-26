@@ -1,4 +1,3 @@
-import LowOnBalanceTip from '../molecules/LowOnBalanceTip'
 import NFTModal from '../organisms/NFTModal'
 import NFTModalProvider from '../providers/NFTModalProvider'
 import { Web3Context } from '../providers/Web3Provider'
@@ -19,7 +18,7 @@ export default function BaseLayout({ children }) {
   const { network, balance, isReady, hasWeb3 } = useContext(Web3Context)
   const isLowOnEther = balance < 0.1
 
-  const [collapsed, setCollapsed] = useState(true)
+  const [collapsed, setCollapsed] = useState(false)
 
   const { account } = useContext(Web3Context)
 
@@ -63,14 +62,14 @@ export default function BaseLayout({ children }) {
         </Sider>
         <Layout className="site-layout">
           <Content style={{ margin: '0 16px' }}>
-            <Breadcrumb style={{ margin: '16px 0' }}>
-              <Breadcrumb.Item>User</Breadcrumb.Item>
+            <Breadcrumb className='bread'>
+              <Breadcrumb.Item>User /</Breadcrumb.Item>
               <Breadcrumb.Item>{account}</Breadcrumb.Item>
             </Breadcrumb>
             <div style={{ padding: 24, minHeight: 360 }}>
               <NFTModalProvider>
                 {/* <NavBar /> */}
-                {hasWeb3 && isReady && network && isLowOnEther && <LowOnBalanceTip />}
+                {hasWeb3 && isReady && network && isLowOnEther}
                 {children}
                 <NFTModal />
               </NFTModalProvider>

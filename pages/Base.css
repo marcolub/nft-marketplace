@@ -1,0 +1,10 @@
+.ant-layout{
+    background-color: #334454;
+    background-image: url(../src/components/layout/img/explosiondot.gif);
+    background-size:cover;
+}
+
+.bread{
+    margin: 15px 0px;
+    color: greenyellow;
+}

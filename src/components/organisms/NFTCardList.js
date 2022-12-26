@@ -9,6 +9,7 @@ import { ethers } from 'ethers'
 import { Web3Context } from '../providers/Web3Provider'
 import { useContext } from 'react'
 import { mapCreatedAndOwnedTokenIdsAsMarketItems } from '../../utils/nft'
+import { green } from '@mui/material/colors'
 
 const useStyles = makeStyles((theme) => ({
   grid: {
