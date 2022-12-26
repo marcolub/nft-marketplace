@@ -1,5 +1,8 @@
 {
   "name": "nft-marketplace",
+  "files.associations": {
+    "*.js": "javascriptreact"
+  },
   "private": true,
   "scripts": {
     "dev": "next dev",

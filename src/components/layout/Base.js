@@ -1,17 +1,17 @@
-import { useContext } from 'react'
 import LowOnBalanceTip from '../molecules/LowOnBalanceTip'
 import NFTModal from '../organisms/NFTModal'
 import NFTModalProvider from '../providers/NFTModalProvider'
 import { Web3Context } from '../providers/Web3Provider'
 import { Breadcrumb, Layout, Menu } from 'antd'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   DesktopOutlined,
   PieChartOutlined,
-  UserOutlined,
+  UserOutlined
 } from '@ant-design/icons'
 import Image from 'next/image'
 import logo from './img/logo.png'
+import Link from 'next/link'
 
 const { Content, Sider } = Layout
 
@@ -24,47 +24,37 @@ export default function BaseLayout({ children }) {
   const { account } = useContext(Web3Context)
 
   const giveMenu = () => {
-    
-      return <Menu theme="dark" mode="inline">
-        <Menu.Item key="1">
-
-          <PieChartOutlined />
-          <span>Home</span>
-
+    return <Menu theme="dark" mode="inline">
+      <Menu.Item key="1">
+        <PieChartOutlined />
+        <span>Home</span>
+      </Menu.Item>
+      <Menu.Item key="2">
+        <UserOutlined />
+        <span><Link href='/my-nfts'>My NFTs</Link></span>
+      </Menu.Item>
+      <Menu.Item key="3">
+        <DesktopOutlined />
+        <span><Link href='/'>Marketplace</Link></span>
+      </Menu.Item>
+      <Menu.SubMenu title="Collections">
+        <Menu.Item key="4">
+          <span>Soldier</span>
         </Menu.Item>
-        <Menu.Item key="2">
-          <UserOutlined />
-          
-            <span><a href='/my-nfts'>My NFTs</a></span>
-          
+        <Menu.Item key="5">
+          <span>Card</span>
         </Menu.Item>
-        <Menu.Item key="3">
-          <DesktopOutlined />
-          
-          <span><a href='/'>Marketplace</a></span>
-          
+        <Menu.Item key="6">
+          <span>Material</span>
         </Menu.Item>
-        <Menu.SubMenu title="Collections">
-          <Menu.Item key="4">
+      </Menu.SubMenu>
+    </Menu>
 
-            <span>Soldier</span>
-
-          </Menu.Item>
-          <Menu.Item key="5">
-            <span>Card</span>
-          </Menu.Item>
-          <Menu.Item key="6">
-            <span>Material</span>
-          </Menu.Item>
-        </Menu.SubMenu>
-      </Menu>
-    
   }
 
   return (
     <>
       <Layout style={{ minHeight: '100vh' }}>
-
         <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
           <div style={{ height: 100, background: 'rgba(255, 255, 255, 0.2)' }} >
             <Image src={logo} height="80px" width="80px"></Image>
@@ -88,7 +78,6 @@ export default function BaseLayout({ children }) {
           </Content>
         </Layout>
       </Layout>
-
     </>
   )
 }
