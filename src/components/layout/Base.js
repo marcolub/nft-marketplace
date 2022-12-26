@@ -1,12 +1,10 @@
 import { useContext } from 'react'
 import LowOnBalanceTip from '../molecules/LowOnBalanceTip'
-import NavBar from '../molecules/NavBar'
 import NFTModal from '../organisms/NFTModal'
 import NFTModalProvider from '../providers/NFTModalProvider'
 import { Web3Context } from '../providers/Web3Provider'
 import { Breadcrumb, Layout, Menu, theme } from 'antd';
 import React, { useState } from 'react';
-import { BrowserRouter, Link } from "react-router-dom";
 import {
   DesktopOutlined,
   PieChartOutlined,
@@ -15,7 +13,7 @@ import {
 import Image from 'next/image'
 import logo from './img/logo.png'
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Content, Sider } = Layout;
 
 export default function BaseLayout({ children }) {
   const { network, balance, isReady, hasWeb3 } = useContext(Web3Context)
