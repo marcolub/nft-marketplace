@@ -1,26 +1,27 @@
-import { useContext } from 'react';
-import LowOnBalanceTip from '../molecules/LowOnBalanceTip';
-import NFTModal from '../organisms/NFTModal';
-import NFTModalProvider from '../providers/NFTModalProvider';
-import { Web3Context } from '../providers/Web3Provider';
-import { Breadcrumb, Layout, Menu } from 'antd';
-import React, { useState } from 'react';
+import { useContext } from 'react'
+import LowOnBalanceTip from '../molecules/LowOnBalanceTip'
+import NFTModal from '../organisms/NFTModal'
+import NFTModalProvider from '../providers/NFTModalProvider'
+import { Web3Context } from '../providers/Web3Provider'
+import { Breadcrumb, Layout, Menu } from 'antd'
+import React, { useState } from 'react'
 import {
   DesktopOutlined,
   PieChartOutlined,
-} from '@ant-design/icons';
-import Image from 'next/image';
-import logo from './img/logo.png';
+  UserOutlined,
+} from '@ant-design/icons'
+import Image from 'next/image'
+import logo from './img/logo.png'
 
-const { Content, Sider } = Layout;
+const { Content, Sider } = Layout
 
 export default function BaseLayout({ children }) {
   const { network, balance, isReady, hasWeb3 } = useContext(Web3Context)
   const isLowOnEther = balance < 0.1
 
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(true)
 
-  const { account } = useContext(Web3Context);
+  const { account } = useContext(Web3Context)
 
   const giveMenu = () => {
     
@@ -32,7 +33,7 @@ export default function BaseLayout({ children }) {
 
         </Menu.Item>
         <Menu.Item key="2">
-          <DesktopOutlined />
+          <UserOutlined />
           
             <span><a href='/my-nfts'>My NFTs</a></span>
           
