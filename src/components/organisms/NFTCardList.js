@@ -9,6 +9,7 @@ import { ethers } from 'ethers'
 import { Web3Context } from '../providers/Web3Provider'
 import { useContext } from 'react'
 import { mapCreatedAndOwnedTokenIdsAsMarketItems } from '../../utils/nft'
+import { useEffect } from 'react'
 
 const useStyles = makeStyles((theme) => ({
   grid: {
@@ -26,20 +27,24 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
   const classes = useStyles()
-  const { account, marketplaceContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
+  const { account, isReady, marketplaceContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
 
   async function updateNFT(index, tokenId) {
     var updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)(tokenId)
-    setNfts(prevNfts => {
-      const updatedNfts = [...prevNfts]
-      updatedNfts[index] = updatedNFt
-    })
+    if (updateNFt != undefined) {
+      setNfts(prevNfts => {
+        const updatedNfts = [...prevNfts]
+        updatedNfts[index] = updatedNFt
+      })
+    }
     updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)(tokenId)
-    setNfts(prevNfts => {
-      const updatedNfts = [...prevNfts]
-      updatedNfts[index] = updatedNFt
-      return updatedNfts
-    })
+    if (updateNFt != undefined) {
+      setNfts(prevNfts => {
+        const updatedNfts = [...prevNfts]
+        updatedNfts[index] = updatedNFt
+        return updatedNfts
+      })
+    }
   }
 
   async function addNFTToList(tokenId) {
@@ -71,7 +76,7 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
         return <NFTCard nft={nft} action="buy" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
     }
-    return <div style={{ display: 'none' }} />
+    return <div className='tohide' />
   }
 
   return (
@@ -86,6 +91,7 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
               <NFTCardCreation addNFTToList={addNFTToList} />
             </Grid>}
             {nfts.map((nft, i) =>
+              nft != undefined &&
               <Fade in={true} key={i}>
                 <Grid item xs={12} sm={6} md={3} className={classes.gridItem} >
                   <NFT nft={nft} index={i} />
