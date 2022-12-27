@@ -29,13 +29,13 @@ export default function Home () {
     if (!isReady) return
     const data = await marketplaceContract.fetchAvailableMarketItems()
     var items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
-    var items2 = await Promise.raceAll(data.map(mapAvailableMarketItems(MaterialNftContract))
-    , 1000, null).then(results => {
-      let final = results.filter(item => !!item);
-      return final
-    })
-    const items = items1.concat(items2)
-    setNfts(items)
+    // var items2 = await Promise.raceAll(data.map(mapAvailableMarketItems(MaterialNftContract))
+    // , 1000, null).then(results => {
+    //   let final = results.filter(item => !!item);
+    //   return final
+    // })
+    // const items = items1.concat(items2)
+    setNfts(items1)
     setIsLoading(false)
   }
 
