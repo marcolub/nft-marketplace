@@ -46,7 +46,7 @@ export default function CreatorDashboard() {
     var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(MaterialNftContract)
     var myNfts2 = await Promise.raceAll(myUniqueCreatedAndOwnedTokenIds.map(
       mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)
-    ), 4000, null).then(results => {
+    ), 1000, null).then(results => {
       let final = results.filter(item => !!item);
       return final
     })
