@@ -1,7 +1,8 @@
 import { createContext, useEffect, useState } from 'react'
 import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
-import NFT from '../../../artifacts/contracts/NFT.sol/NFT.json'
+import SOLDIER from '../../../artifacts/contracts/HappywarSoldier.sol/HappywarSoldier.json'
+import MATERIAL from '../../../artifacts/contracts/HappywarMaterial.sol/HappywarMaterial.json'
 import Market from '../../../artifacts/contracts/Marketplace.sol/Marketplace.json'
 import axios from 'axios'
 
@@ -11,7 +12,8 @@ const contextDefaultValues = {
   balance: 0,
   connectWallet: () => {},
   marketplaceContract: null,
-  nftContract: null,
+  SoldierNftContract: null,
+  MaterialNftContract: null,
   isReady: false,
   hasWeb3: false
 }
@@ -31,7 +33,8 @@ export default function Web3Provider ({ children }) {
   const [network, setNetwork] = useState(contextDefaultValues.network)
   const [balance, setBalance] = useState(contextDefaultValues.balance)
   const [marketplaceContract, setMarketplaceContract] = useState(contextDefaultValues.marketplaceContract)
-  const [nftContract, setNFTContract] = useState(contextDefaultValues.nftContract)
+  const [SoldierNftContract, setSoldierNFTContract] = useState(contextDefaultValues.SoldierNftContract)
+  const [MaterialNftContract, setMaterialNFTContract] = useState(contextDefaultValues.MaterialNftContract)
   const [isReady, setIsReady] = useState(contextDefaultValues.isReady)
 
   useEffect(() => {
@@ -109,14 +112,17 @@ export default function Web3Provider ({ children }) {
   async function setupContracts (signer, networkName) {
     if (!networkName) {
       setMarketplaceContract(null)
-      setNFTContract(null)
+      setSoldierNFTContract(null)
+      setMaterialNFTContract(null)
       return false
     }
     const { data } = await axios(`/api/addresses?network=${networkName}`)
     const marketplaceContract = new ethers.Contract(data.marketplaceAddress, Market.abi, signer)
     setMarketplaceContract(marketplaceContract)
-    const nftContract = new ethers.Contract(data.nftAddress, NFT.abi, signer)
-    setNFTContract(nftContract)
+    const nftContract1 = new ethers.Contract(data.SoldierNftAddress, SOLDIER.abi, signer)
+    setSoldierNFTContract(nftContract1)
+    const nftContract2 = new ethers.Contract(data.MaterialNftAddress, MATERIAL.abi, signer)
+    setMaterialNFTContract(nftContract2)
     return true
   }
 
@@ -125,7 +131,8 @@ export default function Web3Provider ({ children }) {
       value={{
         account,
         marketplaceContract,
-        nftContract,
+        SoldierNftContract,
+        MaterialNftContract,
         isReady,
         network,
         balance,

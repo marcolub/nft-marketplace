@@ -5,7 +5,7 @@ import { makeStyles } from '@mui/styles'
 import { Card, CardActions, CardContent, CardMedia, Button, Divider, Box, CircularProgress } from '@mui/material'
 import { NFTModalContext } from '../src/components/providers/NFTModalProvider'
 import { Web3Context } from '../src/components/providers/Web3Provider'
-import { Table } from 'antd'
+import { Table, Row } from 'antd'
 import axios from 'axios'
 import { useRouter } from 'next/router';
 
@@ -60,7 +60,7 @@ async function getAndSetListingFee(marketplaceContract, setListingFee) {
 
 export default function Details({ }) {
     const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
-    const { account, marketplaceContract, nftContract, isReady, hasWeb3, network } = useContext(Web3Context)
+    const { account, marketplaceContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
     const [metadata, setMetadata] = useState({})
     const [data, setData] = useState([])
     const [traits, setTraits] = useState({})
@@ -76,7 +76,11 @@ export default function Details({ }) {
 
     const router = useRouter();
     const { name, description, tokenId, image } = router.query
-
+    var nftContract = ''
+    if (name != undefined) {
+        if (name.startsWith('Soldier')) nftContract = SoldierNftContract
+        if (name.startsWith('Material')) nftContract = MaterialNftContract
+    }
     useEffect(() => {
         getAndSetListingFee(marketplaceContract, setListingFee)
         fetchdata()
@@ -123,9 +127,17 @@ export default function Details({ }) {
 
             console.log(resp.data.data.items[0].nft_transactions)
             resp.data.data.items[0].nft_transactions.forEach((value) => {
-                const tempevent = ''
-                
-                const tempprice =  value.value == 0 ? '-' : `${value.value}`
+                var tempevent = ''
+                if (value.value == 45000000000000000) {
+                    tempevent = 'list'
+                }
+                if (value.value == 0) {
+                    tempevent = 'sell'
+                }
+                if (value.value > 45000000000000000) {
+                    tempevent = 'buy'
+                }
+                const tempprice = value.value == 0 ? '-' : `${value.value}`
                 var temp = {
                     from_address: value.from_address,
                     to_address: value.to_address,
@@ -152,21 +164,23 @@ export default function Details({ }) {
 
     return (
         <>
-            <img style={{width:'512px',height:'512px'}} src={image}></img>
-            <Divider className={classes.firstDivider} />
-            <div >
-                <div>
-                <h2>{name}</h2>
-                <h2>{description}</h2>
-                </div>
+            <Row>
+                <img style={{ width: '512px', height: '512px' }} src={image}></img>
                 <Divider className={classes.firstDivider} />
                 <div>
                     {Object.entries(traits).map(([key, val]) => {
-                        return <Row style={{ paddingLeft: '10%' }} key={Object.entries(traits).indexOf(val)}>
-                            <h2><a>{key}</a> {val}</h2>
-                        </Row>
+                        return <div style={{ paddingLeft: '10%' }} key={Object.entries(traits).indexOf(val)}>
+                            <h2><a>{key}</a></h2><h2> {val}</h2>
+                        </div>
                     })}
                 </div>
+            </Row>
+            <div >
+                <div>
+                    <h2>{name}</h2>
+                    <h2>{description}</h2>
+                </div>
+                <Divider className={classes.firstDivider} />
                 <Divider className={classes.firstDivider} />
                 <Table columns={columns} dataSource={data} />
             </div>

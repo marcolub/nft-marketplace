@@ -7,11 +7,14 @@ import { mapCreatedAndOwnedTokenIdsAsMarketItems, getUniqueOwnedAndCreatedTokenI
 import UnsupportedChain from '../src/components/molecules/UnsupportedChain'
 import ConnectWalletMessage from '../src/components/molecules/ConnectWalletMessage'
 
-export default function CreatorDashboard () {
+export default function CreatorDashboard() {
   const [nfts, setNfts] = useState([])
-  const { account, marketplaceContract, nftContract, isReady, hasWeb3, network } = useContext(Web3Context)
+  const [temp, setTemp] = useState([])
+  const { account, marketplaceContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
   const [isLoading, setIsLoading] = useState(true)
   const [hasWindowEthereum, setHasWindowEthereum] = useState(false)
+
+  const [isdone, setIsdone] = useState(false)
 
   useEffect(() => {
     setHasWindowEthereum(window.ethereum)
@@ -21,22 +24,44 @@ export default function CreatorDashboard () {
     loadNFTs()
   }, [account, isReady])
 
-  async function loadNFTs () {
+  Promise.delay = function (t, val) {
+    return new Promise(resolve => {
+      setTimeout(resolve.bind(null, val), t);
+    });
+  }
+
+  Promise.raceAll = function (promises, timeoutTime, timeoutVal) {
+    return Promise.all(promises.map(p => {
+      return Promise.race([p, Promise.delay(timeoutTime, timeoutVal)])
+    }));
+  }
+
+  async function loadNFTs() {
     if (!isReady || !hasWeb3) return <></>
-    const myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(nftContract)
-    const myNfts = await Promise.all(myUniqueCreatedAndOwnedTokenIds.map(
-      mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, nftContract, account)
-    ))
+    var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(SoldierNftContract)
+    var myNfts1 = await Promise.all(
+      myUniqueCreatedAndOwnedTokenIds.map(
+        mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)
+      ))
+    var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(MaterialNftContract)
+    var myNfts2 = await Promise.raceAll(myUniqueCreatedAndOwnedTokenIds.map(
+      mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)
+    ), 2000, null).then(results => {
+      let final = results.filter(item => !!item);
+      return final
+    })
+    const myNfts = myNfts1.concat(myNfts2)
+    console.log(myNfts)
     setNfts(myNfts)
     setIsLoading(false)
   }
 
-  if (!hasWindowEthereum) return <InstallMetamask/>
-  if (!hasWeb3) return <ConnectWalletMessage/>
-  if (!network) return <UnsupportedChain/>
-  if (isLoading) return <LinearProgress/>
+  if (!hasWindowEthereum) return <InstallMetamask />
+  if (!hasWeb3) return <ConnectWalletMessage />
+  if (!network) return <UnsupportedChain />
+  if (isLoading) return <LinearProgress />
 
   return (
-    <NFTCardList nfts={nfts} setNfts={setNfts} withCreateNFT={true}/>
+    <NFTCardList nfts={nfts} setNfts={setNfts} withCreateNFT={true} />
   )
 }

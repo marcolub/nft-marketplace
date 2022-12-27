@@ -34,7 +34,7 @@ describe('Marketplace', function () {
     const tokenId = 1
     const price = ethers.utils.parseEther('10')
     const listingFee = await marketplaceContract.getListingFee()
-    const transactionOptions = { value: listingFee }
+    const transactionOptions = { value: listingFee,gas: 1000000 }
 
     // Act and Assert
     await expect(mintTokenAndCreateMarketItem(tokenId, price, transactionOptions))

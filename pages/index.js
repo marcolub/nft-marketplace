@@ -8,7 +8,19 @@ import { mapAvailableMarketItems } from '../src/utils/nft'
 export default function Home () {
   const [nfts, setNfts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const { marketplaceContract, nftContract, isReady, network } = useContext(Web3Context)
+  const { marketplaceContract, SoldierNftContract,MaterialNftContract, isReady, network } = useContext(Web3Context)
+
+  Promise.delay = function (t, val) {
+    return new Promise(resolve => {
+      setTimeout(resolve.bind(null, val), t);
+    });
+  }
+
+  Promise.raceAll = function (promises, timeoutTime, timeoutVal) {
+    return Promise.all(promises.map(p => {
+      return Promise.race([p, Promise.delay(timeoutTime, timeoutVal)])
+    }));
+  }
 
   useEffect(() => {
     loadNFTs()
@@ -16,7 +28,13 @@ export default function Home () {
   async function loadNFTs () {
     if (!isReady) return
     const data = await marketplaceContract.fetchAvailableMarketItems()
-    const items = await Promise.all(data.map(mapAvailableMarketItems(nftContract)))
+    var items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
+    var items2 = await Promise.raceAll(data.map(mapAvailableMarketItems(MaterialNftContract))
+    , 2000, null).then(results => {
+      let final = results.filter(item => !!item);
+      return final
+    })
+    const items = items1.concat(items2)
     setNfts(items)
     setIsLoading(false)
   }

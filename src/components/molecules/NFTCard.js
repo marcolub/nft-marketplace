@@ -64,7 +64,7 @@ async function getAndSetListingFee(marketplaceContract, setListingFee) {
 
 const NFTCard = ({ nft, action, updateNFT }) => {
   const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
-  const { nftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
+  const { SoldierNftContract, MaterialNftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
   const [isHovered, setIsHovered] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [listingFee, setListingFee] = useState('')
@@ -73,6 +73,11 @@ const NFTCard = ({ nft, action, updateNFT }) => {
   const classes = useStyles()
   const { name, description, image } = nft
 
+  var nftContract = ''
+  if (name != undefined) {
+    if (name.startsWith('Soldier')) nftContract = SoldierNftContract
+    if (name.startsWith('Material')) nftContract = MaterialNftContract
+  }
   const router = useRouter();
 
   useEffect(() => {
@@ -132,7 +137,11 @@ const NFTCard = ({ nft, action, updateNFT }) => {
     setPriceError(false)
     const listingFee = await marketplaceContract.getListingFee()
     const priceInWei = ethers.utils.parseUnits(newPrice, 'ether')
-    const transaction = await marketplaceContract.createMarketItem(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
+    var transaction = undefined
+    if (name.startsWith('Soldier'))
+      transaction = await marketplaceContract.createMarketItemSoldier(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
+    if (name.startsWith('Material'))
+      transaction = await marketplaceContract.createMarketItemMaterial(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
     await transaction.wait()
     updateNFT()
     return transaction
@@ -142,8 +151,8 @@ const NFTCard = ({ nft, action, updateNFT }) => {
     // setModalNFT(nft)
     // setIsModalOpen(true)
     router.push({
-      pathname:'/details', 
-      query:{ 
+      pathname: '/details',
+      query: {
         name: nft.name,
         description: nft.description,
         tokenId: parseInt(nft.tokenId),
@@ -164,45 +173,45 @@ const NFTCard = ({ nft, action, updateNFT }) => {
   }
 
   return (
-      <Card
-        className={classes.root}
-        raised={isHovered}
-        onMouseEnter={() => setIsHovered(true)}
-        onMouseLeave={() => setIsHovered(false)}
-      >
-        <CardMedia
-          className={classes.media}
-          alt={name}
-          image={image}
-          component="a" onClick={handleCardImageClick}
-        />
+    <Card
+      className={classes.root}
+      raised={isHovered}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <CardMedia
+        className={classes.media}
+        alt={name}
+        image={image}
+        component="a" onClick={handleCardImageClick}
+      />
 
-        <CardContent className={classes.cardContent} >
-          <NFTName name={name} />
-          <NFTDescription description={description} />
-          <Divider className={classes.firstDivider} />
-          <Box className={classes.addressesAndPrice}>
-            <div className={classes.addessesContainer}>
-              <CardAddresses nft={nft} />
-            </div>
-            <div className={classes.priceContainer}>
-              {action === 'sell'
-                ? <PriceTextField listingFee={listingFee} error={priceError} disabled={isLoading} onChange={e => setPrice(e.target.value)} />
-                : <NFTPrice nft={nft} />
-              }
-            </div>
-          </Box>
-          <Divider className={classes.lastDivider} />
-        </CardContent>
-        <CardActions className={classes.cardActions}>
-          <Button size="small" onClick={() => !isLoading && onClick(nft)}>
-            {isLoading
-              ? <CircularProgress size="20px" />
-              : hasWeb3 && actions[action].text
+      <CardContent className={classes.cardContent} >
+        <NFTName name={name} />
+        <NFTDescription description={description} />
+        <Divider className={classes.firstDivider} />
+        <Box className={classes.addressesAndPrice}>
+          <div className={classes.addessesContainer}>
+            <CardAddresses nft={nft} />
+          </div>
+          <div className={classes.priceContainer}>
+            {action === 'sell'
+              ? <PriceTextField listingFee={listingFee} error={priceError} disabled={isLoading} onChange={e => setPrice(e.target.value)} />
+              : <NFTPrice nft={nft} />
             }
-          </Button>
-        </CardActions>
-      </Card>
+          </div>
+        </Box>
+        <Divider className={classes.lastDivider} />
+      </CardContent>
+      <CardActions className={classes.cardActions}>
+        <Button size="small" onClick={() => !isLoading && onClick(nft)}>
+          {isLoading
+            ? <CircularProgress size="20px" />
+            : hasWeb3 && actions[action].text
+          }
+        </Button>
+      </CardActions>
+    </Card>
   )
 }
 
