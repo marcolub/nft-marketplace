@@ -3,9 +3,10 @@ import { ethers } from 'ethers'
 
 export async function getTokenMetadataByTokenId(nftContract, tokenId) { 
   try {
-    const tokenUri = await nftContract.tokenURI(tokenId)
-    const { data: metadata } = await axios.get(tokenUri)
-    return metadata
+    // const tokenUri = await nftContract.tokenURI(tokenId)
+    const { data: metadata } = await axios.get(`https://api.covalenthq.com/v1/80001/tokens/${nftContract.address}/nft_metadata/${tokenId}/?key=ckey_ccf942cdee9b4cd6b223e2d5767`)
+    console.log(metadata)
+    return metadata.data.items[0].nft_data[0].external_data
   } catch (error) {
     console.log(error)
   }

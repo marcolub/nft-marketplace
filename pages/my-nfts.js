@@ -24,18 +24,6 @@ export default function CreatorDashboard() {
     loadNFTs()
   }, [account, isReady])
 
-  Promise.delay = function (t, val) {
-    return new Promise(resolve => {
-      setTimeout(resolve.bind(null, val), t);
-    });
-  }
-
-  Promise.raceAll = function (promises, timeoutTime, timeoutVal) {
-    return Promise.all(promises.map(p => {
-      return Promise.race([p, Promise.delay(timeoutTime, timeoutVal)])
-    }));
-  }
-
   async function loadNFTs() {
     if (!isReady || !hasWeb3) return <></>
     var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(SoldierNftContract)
@@ -44,12 +32,8 @@ export default function CreatorDashboard() {
         mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)
       ))
     var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(MaterialNftContract)
-    var myNfts2 = await Promise.raceAll(myUniqueCreatedAndOwnedTokenIds.map(
-      mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)
-    ), 1000, null).then(results => {
-      let final = results.filter(item => !!item);
-      return final
-    })
+    var myNfts2 = await Promise.all(myUniqueCreatedAndOwnedTokenIds.map(
+      mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)))
     const myNfts = myNfts1.concat(myNfts2)
     console.log(myNfts)
     setNfts(myNfts)
