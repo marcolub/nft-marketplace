@@ -71,26 +71,30 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
         return <NFTCard nft={nft} action="buy" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
     }
-    return <div style={{ hidden: 'true' }} />
+    return <div style={{ display: 'none' }} />
   }
 
   return (
-    <InfiniteScroll
-      dataLength={nfts.length}
-      loader={<LinearProgress />}
-    >
-      <Grid container className={classes.grid} id="grid">
-        {withCreateNFT && <Grid item xs={12} sm={6} md={3} className={classes.gridItem}>
-          <NFTCardCreation addNFTToList={addNFTToList} />
-        </Grid>}
-        {nfts.map((nft, i) =>
-          <Fade in={true} key={i}>
-            <Grid item xs={12} sm={6} md={3} className={classes.gridItem} >
-              <NFT nft={nft} index={i} />
-            </Grid>
-          </Fade>
-        )}
-      </Grid>
-    </InfiniteScroll>
+    <>
+      {nfts != undefined &&
+        <InfiniteScroll
+          dataLength={nfts.length}
+          loader={<LinearProgress />}
+        >
+          <Grid container className={classes.grid} id="grid">
+            {withCreateNFT && <Grid item xs={12} sm={6} md={3} className={classes.gridItem}>
+              <NFTCardCreation addNFTToList={addNFTToList} />
+            </Grid>}
+            {nfts.map((nft, i) =>
+              <Fade in={true} key={i}>
+                <Grid item xs={12} sm={6} md={3} className={classes.gridItem} >
+                  <NFT nft={nft} index={i} />
+                </Grid>
+              </Fade>
+            )}
+          </Grid>
+        </InfiniteScroll>
+      }
+    </>
   )
 }

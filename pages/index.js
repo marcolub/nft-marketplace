@@ -30,7 +30,7 @@ export default function Home () {
     const data = await marketplaceContract.fetchAvailableMarketItems()
     var items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
     var items2 = await Promise.raceAll(data.map(mapAvailableMarketItems(MaterialNftContract))
-    , 2000, null).then(results => {
+    , 4000, 1000).then(results => {
       let final = results.filter(item => !!item);
       return final
     })
