@@ -4,6 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "./HappywarSoldier.sol";
 import "./HappywarMaterial.sol";
+import "./HappywarCard.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 
@@ -109,6 +110,47 @@ contract Marketplace is ReentrancyGuard {
         uint256 marketItemId = _marketItemIds.current();
 
         address creator = HappywarMaterial(nftContractAddress).getTokenCreatorById(tokenId);
+
+        marketItemIdToMarketItem[marketItemId] = MarketItem(
+            marketItemId,
+            nftContractAddress,
+            tokenId,
+            payable(creator),
+            payable(msg.sender),
+            payable(address(0)),
+            price,
+            false,
+            false
+        );
+
+        IERC721(nftContractAddress).transferFrom(msg.sender, address(this), tokenId);
+
+        emit MarketItemCreated(
+            marketItemId,
+            nftContractAddress,
+            tokenId,
+            payable(creator),
+            payable(msg.sender),
+            payable(address(0)),
+            price,
+            false,
+            false
+        );
+
+        return marketItemId;
+    }
+
+    function createMarketItemCard(
+        address nftContractAddress,
+        uint256 tokenId,
+        uint256 price
+    ) public payable nonReentrant returns (uint256) {
+        require(price > 0, "Price must be at least 1 wei");
+        require(msg.value == listingFee, "Price must be equal to listing price");
+        _marketItemIds.increment();
+        uint256 marketItemId = _marketItemIds.current();
+
+        address creator = HappywarCard(nftContractAddress).getTokenCreatorById(tokenId);
 
         marketItemIdToMarketItem[marketItemId] = MarketItem(
             marketItemId,

@@ -30,7 +30,7 @@ export default function NFTCardCreation({ addNFTToList }) {
   const [fileUrl, setFileUrl] = useState(defaultFileUrl)
   const classes = useStyles()
   const { register, handleSubmit, reset } = useForm()
-  const { SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
+  const { CardNftContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
   const [isLoading, setIsLoading] = useState(false)
 
   const [name, setName] = useState('')
@@ -45,6 +45,8 @@ export default function NFTCardCreation({ addNFTToList }) {
       transaction = await SoldierNftContract.mintToken(metadataUrl)
     if (collection == 'material')
       transaction = await MaterialNftContract.mintToken(metadataUrl)
+    if (collection == 'card')
+      transaction = await CardNftContract.mintToken(metadataUrl)
     const tx = await transaction.wait()
     const event = tx.events[0]
     const tokenId = event.args[2]
@@ -90,7 +92,7 @@ export default function NFTCardCreation({ addNFTToList }) {
     }
   }
 
-  async function mintButton(){
+  async function mintButton() {
 
     let data = new FormData();
     data.append('file', file, file.name);
@@ -115,7 +117,7 @@ export default function NFTCardCreation({ addNFTToList }) {
     const resp = await axios.post("http://localhost:5002/api/store/json",
       { json: JSON.stringify(metaData) })
     console.log(resp.data.uri)
-    const tokenId = await createNft(resp.data.uri,collection)
+    const tokenId = await createNft(resp.data.uri, collection)
     addNFTToList(tokenId)
     setFileUrl(myimageurl)
     reset()

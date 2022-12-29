@@ -60,7 +60,7 @@ async function getAndSetListingFee(marketplaceContract, setListingFee) {
 
 export default function Details({ }) {
     const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
-    const { account, marketplaceContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
+    const { account, CardNftContract,marketplaceContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
     const [metadata, setMetadata] = useState({})
     const [data, setData] = useState([])
     const [traits, setTraits] = useState({})
@@ -80,6 +80,7 @@ export default function Details({ }) {
     if (name != undefined) {
         if (name.startsWith('Soldier')) nftContract = SoldierNftContract
         if (name.startsWith('Material')) nftContract = MaterialNftContract
+        if (name.startsWith('Card')) nftContract = CardNftContract
     }
     useEffect(() => {
         getAndSetListingFee(marketplaceContract, setListingFee)

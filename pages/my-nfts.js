@@ -10,11 +10,9 @@ import ConnectWalletMessage from '../src/components/molecules/ConnectWalletMessa
 export default function CreatorDashboard() {
   const [nfts, setNfts] = useState([])
   const [temp, setTemp] = useState([])
-  const { account, marketplaceContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
+  const { account, marketplaceContract, CardNftContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
   const [isLoading, setIsLoading] = useState(true)
   const [hasWindowEthereum, setHasWindowEthereum] = useState(false)
-
-  const [isdone, setIsdone] = useState(false)
 
   useEffect(() => {
     setHasWindowEthereum(window.ethereum)
@@ -34,8 +32,11 @@ export default function CreatorDashboard() {
     var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(MaterialNftContract)
     var myNfts2 = await Promise.all(myUniqueCreatedAndOwnedTokenIds.map(
       mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)))
-    const myNfts = myNfts1.concat(myNfts2)
-    console.log(myNfts)
+    var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(CardNftContract)
+    var myNfts3 = await Promise.all(myUniqueCreatedAndOwnedTokenIds.map(
+      mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, CardNftContract, account)))
+    const myNfts = myNfts1.concat(myNfts2).concat(myNfts3)
+    myNfts.sort((x)=>x.marketItemId)
     setNfts(myNfts)
     setIsLoading(false)
   }

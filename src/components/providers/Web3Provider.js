@@ -3,6 +3,7 @@ import Web3Modal from 'web3modal'
 import { ethers } from 'ethers'
 import SOLDIER from '../../../artifacts/contracts/HappywarSoldier.sol/HappywarSoldier.json'
 import MATERIAL from '../../../artifacts/contracts/HappywarMaterial.sol/HappywarMaterial.json'
+import CARD from '../../../artifacts/contracts/HappywarCard.sol/HappywarCard.json'
 import Market from '../../../artifacts/contracts/Marketplace.sol/Marketplace.json'
 import axios from 'axios'
 
@@ -14,6 +15,7 @@ const contextDefaultValues = {
   marketplaceContract: null,
   SoldierNftContract: null,
   MaterialNftContract: null,
+  CardNftContract: null,
   isReady: false,
   hasWeb3: false
 }
@@ -35,6 +37,7 @@ export default function Web3Provider ({ children }) {
   const [marketplaceContract, setMarketplaceContract] = useState(contextDefaultValues.marketplaceContract)
   const [SoldierNftContract, setSoldierNFTContract] = useState(contextDefaultValues.SoldierNftContract)
   const [MaterialNftContract, setMaterialNFTContract] = useState(contextDefaultValues.MaterialNftContract)
+  const [CardNftContract,setCardNftContract] = useState(contextDefaultValues.CardNftContract)
   const [isReady, setIsReady] = useState(contextDefaultValues.isReady)
 
   useEffect(() => {
@@ -114,6 +117,7 @@ export default function Web3Provider ({ children }) {
       setMarketplaceContract(null)
       setSoldierNFTContract(null)
       setMaterialNFTContract(null)
+      setCardNftContract(null)
       return false
     }
     const { data } = await axios(`/api/addresses?network=${networkName}`)
@@ -123,6 +127,8 @@ export default function Web3Provider ({ children }) {
     setSoldierNFTContract(nftContract1)
     const nftContract2 = new ethers.Contract(data.MaterialNftAddress, MATERIAL.abi, signer)
     setMaterialNFTContract(nftContract2)
+    const nftContract3 = new ethers.Contract(data.CardNftAddress, CARD.abi, signer)
+    setCardNftContract(nftContract3)
     return true
   }
 
@@ -133,6 +139,7 @@ export default function Web3Provider ({ children }) {
         marketplaceContract,
         SoldierNftContract,
         MaterialNftContract,
+        CardNftContract,
         isReady,
         network,
         balance,

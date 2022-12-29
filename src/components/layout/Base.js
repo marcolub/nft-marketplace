@@ -36,17 +36,6 @@ export default function BaseLayout({ children }) {
         <DesktopOutlined />
         <span><Link href='/'>Marketplace</Link></span>
       </Menu.Item>
-      <Menu.SubMenu title="Collections">
-        <Menu.Item key="4">
-          <span>Soldier</span>
-        </Menu.Item>
-        <Menu.Item key="5">
-          <span>Card</span>
-        </Menu.Item>
-        <Menu.Item key="6">
-          <span>Material</span>
-        </Menu.Item>
-      </Menu.SubMenu>
     </Menu>
 
   }

@@ -64,7 +64,7 @@ async function getAndSetListingFee(marketplaceContract, setListingFee) {
 
 const NFTCard = ({ nft, action, updateNFT }) => {
   const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
-  const { SoldierNftContract, MaterialNftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
+  const { CardNftContract, SoldierNftContract, MaterialNftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
   const [isHovered, setIsHovered] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [listingFee, setListingFee] = useState('')
@@ -77,6 +77,7 @@ const NFTCard = ({ nft, action, updateNFT }) => {
   if (name != undefined) {
     if (name.startsWith('Soldier')) nftContract = SoldierNftContract
     if (name.startsWith('Material')) nftContract = MaterialNftContract
+    if (name.startsWith('Card')) nftContract = CardNftContract
   }
   const router = useRouter();
 
@@ -142,6 +143,8 @@ const NFTCard = ({ nft, action, updateNFT }) => {
       transaction = await marketplaceContract.createMarketItemSoldier(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
     if (name.startsWith('Material'))
       transaction = await marketplaceContract.createMarketItemMaterial(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
+    if (name.startsWith('Card'))
+      transaction = await marketplaceContract.createMarketItemCard(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
     await transaction.wait()
     updateNFT()
     return transaction

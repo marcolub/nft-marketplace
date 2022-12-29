@@ -27,18 +27,26 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
   const classes = useStyles()
-  const { account, isReady, marketplaceContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
+  const { account, CardNftContract, marketplaceContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
 
   async function updateNFT(index, tokenId) {
     var updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)(tokenId)
-    if (updateNFt != undefined) {
+    if (updatedNFt != undefined) {
       setNfts(prevNfts => {
         const updatedNfts = [...prevNfts]
         updatedNfts[index] = updatedNFt
       })
     }
     updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)(tokenId)
-    if (updateNFt != undefined) {
+    if (updatedNFt != undefined) {
+      setNfts(prevNfts => {
+        const updatedNfts = [...prevNfts]
+        updatedNfts[index] = updatedNFt
+        return updatedNfts
+      })
+    }
+    updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, CardNftContract, account)(tokenId)
+    if (updatedNFt != undefined) {
       setNfts(prevNfts => {
         const updatedNfts = [...prevNfts]
         updatedNfts[index] = updatedNFt
@@ -51,6 +59,8 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
     var nft = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)(tokenId)
     setNfts(prevNfts => [...prevNfts, nft])
     nft = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)(tokenId)
+    setNfts(prevNfts => [...prevNfts, nft])
+    nft = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, CardNftContract, account)(tokenId)
     setNfts(prevNfts => [...prevNfts, nft])
   }
 

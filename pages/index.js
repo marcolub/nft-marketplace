@@ -8,17 +8,20 @@ import { mapAvailableMarketItems } from '../src/utils/nft'
 export default function Home () {
   const [nfts, setNfts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const { marketplaceContract, SoldierNftContract,MaterialNftContract, isReady, network } = useContext(Web3Context)
+  const { marketplaceContract,CardNftContract, SoldierNftContract,MaterialNftContract,account, isReady, network } = useContext(Web3Context)
 
   useEffect(() => {
     loadNFTs()
-  }, [isReady])
+  }, [account,isReady])
+
   async function loadNFTs () {
     if (!isReady) return
     const data = await marketplaceContract.fetchAvailableMarketItems()
     var items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
     var items2 = await Promise.all(data.map(mapAvailableMarketItems(MaterialNftContract)))
-    const items = items1.concat(items2)
+    var items3 = await Promise.all(data.map(mapAvailableMarketItems(CardNftContract)))
+    const items = items1.concat(items2).concat(items3)
+    items.sort((x)=>x.marketItemId)
     setNfts(items)
     setIsLoading(false)
   }
