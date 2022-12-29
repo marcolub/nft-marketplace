@@ -237,6 +237,27 @@ contract Marketplace is ReentrancyGuard {
     }
 
     /**
+     * @dev Fetch sold market items
+     */
+    function fetchSoldMarketItems() public view returns (MarketItem[] memory) {
+        uint256 itemsCount = _marketItemIds.current();
+        uint256 soldItemsCount = _tokensSold.current();
+
+        MarketItem[] memory marketItems = new MarketItem[](soldItemsCount);
+
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < itemsCount; i++) {
+          
+            MarketItem memory item = marketItemIdToMarketItem[i + 1];
+            if (item.sold == false) continue;
+            marketItems[currentIndex] = item;
+            currentIndex += 1;
+        }
+
+        return marketItems;
+    }
+
+    /**
      * @dev Fetch non sold and non canceled market items
      */
     function fetchAvailableMarketItems() public view returns (MarketItem[] memory) {

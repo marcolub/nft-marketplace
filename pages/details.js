@@ -132,11 +132,8 @@ export default function Details({ }) {
                 if (value.value == 45000000000000000) {
                     tempevent = 'list'
                 }
-                if (value.value == 0) {
+                else if (value.value != 0) {
                     tempevent = 'sell'
-                }
-                if (value.value > 45000000000000000) {
-                    tempevent = 'buy'
                 }
                 const tempprice = value.value == 0 ? '-' : `${value.value}`
                 var temp = {

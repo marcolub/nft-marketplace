@@ -70,21 +70,26 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
         return <NFTCardCreation addNFTToList={addNFTToList} />
       }
 
-      if (nft.owner === account && nft.marketItemId && !nft.hasMarketApproval) {
+      else if (nft.owner === account && nft.marketItemId && !nft.hasMarketApproval) {
         return <NFTCard nft={nft} action="approve" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
 
-      if (nft.owner === account) {
+      else if (nft.owner === account) {
         return <NFTCard nft={nft} action="sell" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
 
-      if (nft.seller === account && !nft.sold) {
+      else if (nft.seller === account && !nft.sold) {
         return <NFTCard nft={nft} action="cancel" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
 
-      if (nft.owner === ethers.constants.AddressZero) {
+      else if (nft.owner === ethers.constants.AddressZero) {
         return <NFTCard nft={nft} action="buy" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
+
+      else{
+        return <NFTCard nft={nft} action="none" updateNFT={() => updateNFT(index, nft.tokenId)} />
+      }
+
     }
     return <div className='tohide' />
   }

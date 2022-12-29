@@ -50,8 +50,8 @@ export function mapMarketItem(marketItem, metadata, tokenId, account, hasMarketA
 }
 
 export async function getUniqueOwnedAndCreatedTokenIds(nftContract) {
-  const nftIdsCreatedByMe = await nftContract.getTokensCreatedByMe()
+  // const nftIdsCreatedByMe = await nftContract.getTokensCreatedByMe()
   const nftIdsOwnedByMe = await nftContract.getTokensOwnedByMe()
-  const myNftIds = [...nftIdsCreatedByMe, ...nftIdsOwnedByMe]
+  const myNftIds = [...nftIdsOwnedByMe]
   return [...new Map(myNftIds.map((item) => [item._hex, item])).values()]
 }

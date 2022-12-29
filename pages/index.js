@@ -20,17 +20,22 @@ export default function Home () {
 
   async function loadNFTs () {
     if (!isReady) return
-    const data = await marketplaceContract.fetchAvailableMarketItems()
+    var data = await marketplaceContract.fetchAvailableMarketItems()
     var items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
     var items2 = await Promise.all(data.map(mapAvailableMarketItems(MaterialNftContract)))
     var items3 = await Promise.all(data.map(mapAvailableMarketItems(CardNftContract)))
-    const items = items1.concat(items2).concat(items3)
-    console.log(items)
-    const sold = items.filter((x)=> x!== undefined).filter((x)=>x.sold==true).sort(function(a, b){return b-a})
-    setTotalSold(sold.length)
-    const listed = items.filter((x)=> x!== undefined).filter((x)=>x.sold==false).sort(function(a,b){return b-a})
-    setLastSold(sold.slice(0,5))
+    var items = items1.concat(items2).concat(items3)
+    const listed = items.filter((x)=> x!== undefined).sort(function(a,b){return b-a})
     setLastListed(listed.slice(0,5))
+    data = await marketplaceContract.fetchSoldMarketItems()
+    items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
+    items2 = await Promise.all(data.map(mapAvailableMarketItems(MaterialNftContract)))
+    items3 = await Promise.all(data.map(mapAvailableMarketItems(CardNftContract)))
+    items = items1.concat(items2).concat(items3)
+    const sold = items.filter((x)=> x!== undefined).sort(function(a, b){return b-a})
+    setTotalSold(sold.length)
+    console.log(sold)
+    setLastSold(sold.slice(0,5))
     setIsLoading(false)
   }
 
