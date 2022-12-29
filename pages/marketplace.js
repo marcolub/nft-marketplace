@@ -5,14 +5,10 @@ import { LinearProgress } from '@mui/material'
 import UnsupportedChain from '../src/components/molecules/UnsupportedChain'
 import { mapAvailableMarketItems } from '../src/utils/nft'
 
-export default function Home () {
+export default function Marketplace () {
   const [nfts, setNfts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const { marketplaceContract,CardNftContract, SoldierNftContract,MaterialNftContract,account, isReady, network } = useContext(Web3Context)
-
-  const [lastSold,setLastSold] = useState([])
-  const [lastListed,setLastListed] = useState([])
-  const [totalSold,setTotalSold] = useState(0)
 
   useEffect(() => {
     loadNFTs()
@@ -25,26 +21,15 @@ export default function Home () {
     var items2 = await Promise.all(data.map(mapAvailableMarketItems(MaterialNftContract)))
     var items3 = await Promise.all(data.map(mapAvailableMarketItems(CardNftContract)))
     const items = items1.concat(items2).concat(items3)
-    console.log(items)
-    const sold = items.filter((x)=> x!== undefined).filter((x)=>x.sold==true).sort(function(a, b){return b-a})
-    setTotalSold(sold.length)
-    const listed = items.filter((x)=> x!== undefined).filter((x)=>x.sold==false).sort(function(a,b){return b-a})
-    setLastSold(sold.slice(0,5))
-    setLastListed(listed.slice(0,5))
+    items.sort((x)=>x.marketItemId)
+    setNfts(items)
     setIsLoading(false)
   }
 
   if (!network) return <UnsupportedChain/>
   if (isLoading) return <LinearProgress/>
-  if (!isLoading && !lastSold.length && !lastListed.length) return <h1>No NFTs for sale</h1>
+  if (!isLoading && !nfts.length) return <h1>No NFTs for sale</h1>
   return (
-    <>
-    <h1>Total sold</h1>
-    <p>{totalSold}</p>
-    <h1>Last sold</h1>
-    <NFTCardList nfts={lastSold} setNfts={setLastSold} withCreateNFT={false}/>
-    <h1>Last listed</h1>
-    <NFTCardList nfts={lastListed} setNfts={setLastListed} withCreateNFT={false}/>
-    </>
+    <NFTCardList nfts={nfts} setNfts={setNfts} withCreateNFT={false}/>
   )
 }

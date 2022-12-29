@@ -26,7 +26,7 @@ export default function BaseLayout({ children }) {
     return <Menu theme="dark" mode="inline">
       <Menu.Item key="1">
         <PieChartOutlined />
-        <span>Home</span>
+        <span><Link href='/'>Home</Link></span>
       </Menu.Item>
       <Menu.Item key="2">
         <UserOutlined />
@@ -34,7 +34,7 @@ export default function BaseLayout({ children }) {
       </Menu.Item>
       <Menu.Item key="3">
         <DesktopOutlined />
-        <span><Link href='/'>Marketplace</Link></span>
+        <span><Link href='/marketplace'>Marketplace</Link></span>
       </Menu.Item>
     </Menu>
 
