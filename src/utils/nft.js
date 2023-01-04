@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { ethers } from 'ethers'
 
-export async function getTokenMetadataByTokenId(nftContract, tokenId) { 
+export async function getTokenMetadataByTokenId(nftContract, tokenId) {
   try {
     // const tokenUri = await nftContract.tokenURI(tokenId)
     const { data: metadata } = await axios.get(`https://api.covalenthq.com/v1/80001/tokens/${nftContract.address}/nft_metadata/${tokenId}/?key=ckey_ccf942cdee9b4cd6b223e2d5767`)
@@ -55,3 +55,8 @@ export async function getUniqueOwnedAndCreatedTokenIds(nftContract) {
   const myNftIds = [...nftIdsOwnedByMe]
   return [...new Map(myNftIds.map((item) => [item._hex, item])).values()]
 }
+
+export async function getMaterialList(stake) {
+  const ids = await stake.ids()
+  return [...new Map(ids.map((item) => [item._hex, item])).values()]
+} 

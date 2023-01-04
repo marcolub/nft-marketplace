@@ -25,9 +25,9 @@ const useStyles = makeStyles((theme) => ({
   }
 }))
 
-export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
+export default function NFTCardList({ nfts, setNfts, withCreateNFT, withStaker = false, withStaker2 = false }) {
   const classes = useStyles()
-  const { account, CardNftContract, marketplaceContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
+  const { account, StakerContract, CardNftContract, marketplaceContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
 
   async function updateNFT(index, tokenId) {
     var updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)(tokenId)
@@ -66,7 +66,15 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
 
   function NFT({ nft, index }) {
     if (nft != undefined) {
-      if (!nft.owner && nft[0] != undefined) {
+      if (withStaker) {
+        return <NFTCard nft={nft} action="stake" updateNFT={() => updateNFT(index, nft.tokenId)} />
+      }
+
+      else if (withStaker2) {
+        return <NFTCard nft={nft} action="unstake" updateNFT={() => updateNFT(index, nft.tokenId)} />
+      }
+
+      else if (!nft.owner && nft[0] != undefined) {
         return <NFTCardCreation addNFTToList={addNFTToList} />
       }
 
@@ -86,7 +94,7 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT }) {
         return <NFTCard nft={nft} action="buy" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
 
-      else{
+      else {
         return <NFTCard nft={nft} action="none" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
 

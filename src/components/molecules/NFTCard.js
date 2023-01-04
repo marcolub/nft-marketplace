@@ -64,7 +64,7 @@ async function getAndSetListingFee(marketplaceContract, setListingFee) {
 
 const NFTCard = ({ nft, action, updateNFT }) => {
   const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
-  const { CardNftContract, SoldierNftContract, MaterialNftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
+  const { StakerContract,CardNftContract, SoldierNftContract, MaterialNftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
   const [isHovered, setIsHovered] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [listingFee, setListingFee] = useState('')
@@ -86,6 +86,14 @@ const NFTCard = ({ nft, action, updateNFT }) => {
   }, [])
 
   const actions = {
+    stake: {
+      text: 'stake',
+      method: stakeNft
+    },
+    unstake: {
+      text: 'unstake',
+      method: unstakeNft
+    },
     buy: {
       text: 'buy',
       method: buyNft
@@ -106,6 +114,15 @@ const NFTCard = ({ nft, action, updateNFT }) => {
       text: '',
       method: () => { }
     }
+  }
+
+  async function unstakeNft(nft) {
+    await StakerContract.withdraw([nft.tokenId])
+  }
+
+  async function stakeNft(nft){
+    const res = await StakerContract.stake([nft.tokenId])
+    console.log(res)
   }
 
   async function buyNft(nft) {

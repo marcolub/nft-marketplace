@@ -4,6 +4,7 @@ import { ethers } from 'ethers'
 import SOLDIER from '../../../artifacts/contracts/HappywarSoldier.sol/HappywarSoldier.json'
 import MATERIAL from '../../../artifacts/contracts/HappywarMaterial.sol/HappywarMaterial.json'
 import CARD from '../../../artifacts/contracts/HappywarCard.sol/HappywarCard.json'
+import STAKE from '../../../artifacts/contracts/Staking.sol/Staking.json'
 import Market from '../../../artifacts/contracts/Marketplace.sol/Marketplace.json'
 import axios from 'axios'
 
@@ -16,6 +17,7 @@ const contextDefaultValues = {
   SoldierNftContract: null,
   MaterialNftContract: null,
   CardNftContract: null,
+  StakerContract: null,
   isReady: false,
   hasWeb3: false
 }
@@ -38,6 +40,7 @@ export default function Web3Provider ({ children }) {
   const [SoldierNftContract, setSoldierNFTContract] = useState(contextDefaultValues.SoldierNftContract)
   const [MaterialNftContract, setMaterialNFTContract] = useState(contextDefaultValues.MaterialNftContract)
   const [CardNftContract,setCardNftContract] = useState(contextDefaultValues.CardNftContract)
+  const [StakerContract,setStakerContract] = useState(contextDefaultValues.StakerContract)
   const [isReady, setIsReady] = useState(contextDefaultValues.isReady)
 
   useEffect(() => {
@@ -118,6 +121,7 @@ export default function Web3Provider ({ children }) {
       setSoldierNFTContract(null)
       setMaterialNFTContract(null)
       setCardNftContract(null)
+      setStakerContract(null)
       return false
     }
     const { data } = await axios(`/api/addresses?network=${networkName}`)
@@ -129,6 +133,8 @@ export default function Web3Provider ({ children }) {
     setMaterialNFTContract(nftContract2)
     const nftContract3 = new ethers.Contract(data.CardNftAddress, CARD.abi, signer)
     setCardNftContract(nftContract3)
+    const nftContract4 = new ethers.Contract(data.StakerAddress, STAKE.abi, signer)
+    setStakerContract(nftContract4)
     return true
   }
 
@@ -140,6 +146,7 @@ export default function Web3Provider ({ children }) {
         SoldierNftContract,
         MaterialNftContract,
         CardNftContract,
+        StakerContract,
         isReady,
         network,
         balance,

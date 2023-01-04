@@ -107,10 +107,24 @@ export default function NFTCardCreation({ addNFTToList }) {
       name: name,
       description: description,
       image: myimageurl,
-      traits: {
-        trait1: trait1,
-        trait2: trait2
-      }
+      attributes: [
+        {
+					trait_type : "accessory",
+				  value : "death",
+				},
+        {
+					trait_type : "costume",
+				  value : "blue",
+				},
+        {
+          trait_type : "troups",
+          value : 3,
+        },
+        {
+          trait_type : "stars",
+          value : 0,
+        },
+      ]
 
     }
     console.log(metaData)
