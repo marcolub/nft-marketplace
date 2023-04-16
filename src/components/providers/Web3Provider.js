@@ -44,7 +44,7 @@ export default function Web3Provider ({ children }) {
   const [isReady, setIsReady] = useState(contextDefaultValues.isReady)
 
   useEffect(() => {
-    initializeWeb3()
+    // initializeWeb3()
   }, [])
 
   async function initializeWeb3WithoutSigner () {

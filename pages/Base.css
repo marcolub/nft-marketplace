@@ -1,18 +1,24 @@
 .ant-layout{
     background-color: #334454;
-    background-image: url(../src/components/layout/img/explosiondot.gif);
+    background-image: url(../src/components/layout/img/moshed.gif);
     background-size:cover;
 }
 
 .bread{
     margin: 15px 0px;
-    color: greenyellow;
+    color: white;
 }
 
 p{
-    color: greenyellow;
+    text-align: center;
+    color: white;
 }
 
 h1{
-    color: greenyellow;
+    text-align: center;
+    color: white;
+}
+
+.MuiPaper-root {
+    background-color: #001529;
 }

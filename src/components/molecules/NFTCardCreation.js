@@ -110,14 +110,18 @@ export default function NFTCardCreation({ addNFTToList }) {
       attributes: [
         {
 					trait_type : "accessory",
-				  value : "death",
+				  value : "smile",
 				},
         {
 					trait_type : "costume",
 				  value : "blue",
 				},
         {
-          trait_type : "troups",
+					trait_type : "type",
+				  value : "medic",
+				},
+        {
+          trait_type : "troops",
           value : 3,
         },
         {

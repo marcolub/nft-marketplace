@@ -9,39 +9,19 @@ import { Web3Context } from '../providers/Web3Provider'
 import NavItem from '../atoms/NavItem'
 import ConnectedAccountAddress from '../atoms/ConnectedAccountAddress'
 import ConnectButton from '../atoms/ConnectButton'
-
-const pages = [
-  {
-    title: 'Market',
-    href: '/'
-  },
-  {
-    title: 'MY NFTs',
-    href: '/my-nfts'
-  }
-]
+import {Row,Col} from 'antd';
 
 const NavBar = () => {
   const { account } = useContext(Web3Context)
-  const logo = '🖼️'
 
   return (
-    <AppBar position="static">
-      <Container maxWidth="100%">
-        <Toolbar disableGutters>
-          <Typography
-            variant="h3"
-            noWrap
-            component="div"
-            sx={{ p: '10px', flexGrow: { xs: 1, md: 0 }, display: 'flex' }}
-          >
-            {logo}
-          </Typography>
-          <Box sx={{ flexGrow: 1, display: 'flex' }}>
-            {pages.map(({ title, href }) => <NavItem title={title} href={href} key={title}/>)}
-          </Box>
-          {account ? <ConnectedAccountAddress account={account}/> : <ConnectButton />}
-        </Toolbar>
+    <AppBar style={{ backgroundColor:'#001529', opacity: '.5'}} position="static">
+      <Container style={{height: '50px'}}>
+        <Row>
+          <Col span={22} style={{marginTop: '6px'}} type="flex" align="right" >
+          {account ? <ConnectedAccountAddress account={account} /> : <ConnectButton />}
+          </Col>
+          </Row>
       </Container>
     </AppBar>
   )

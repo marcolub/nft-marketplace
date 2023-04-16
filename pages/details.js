@@ -63,7 +63,7 @@ export default function Details({ }) {
     const { account, CardNftContract,marketplaceContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
     const [metadata, setMetadata] = useState({})
     const [data, setData] = useState([])
-    const [traits, setTraits] = useState({})
+    const [traits, setTraits] = useState([])
 
     const [myresultcoverimage, SETmyresultcoverimage] = useState("")
     const [myresultarray, SETmyresultarray] = useState([])
@@ -93,7 +93,8 @@ export default function Details({ }) {
         SETmyresultarray([])
         Object.entries(metadata).map(([key, val]) => {
             if (key == 'image') SETmyresultcoverimage(val.replace('ipfs://', 'https://gateway.ipfs.io/ipfs/'))
-            else if (key == 'traits') setTraits(val)
+            else if (key == 'attributes'){setTraits(val)
+                 console.log(traits)}
             else SETmyresultarray(current => [...current, val])
         })
     }, [metadata, traits]);
@@ -166,9 +167,10 @@ export default function Details({ }) {
                 <img style={{ width: '512px', height: '512px' }} src={image}></img>
                 <Divider className={classes.firstDivider} />
                 <div>
-                    {Object.entries(traits).map(([key, val]) => {
-                        return <div style={{ paddingLeft: '10%' }} key={Object.entries(traits).indexOf(val)}>
-                            <h2><a>{key}</a></h2><h2> {val}</h2>
+                
+                    {traits.map((value,i) => {
+                        return <div style={{ paddingLeft: '10%' }} key={value.value}>
+                            <h2><a>{value.trait_type}</a></h2><h2> {value.value}</h2>
                         </div>
                     })}
                 </div>

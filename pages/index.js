@@ -4,6 +4,7 @@ import { Web3Context } from '../src/components/providers/Web3Provider'
 import { LinearProgress } from '@mui/material'
 import UnsupportedChain from '../src/components/molecules/UnsupportedChain'
 import { mapAvailableMarketItems } from '../src/utils/nft'
+import { Card, CardActions, CardContent, CardMedia, Button, Divider, Box, CircularProgress } from '@mui/material'
 
 export default function Home () {
   const [nfts, setNfts] = useState([])
@@ -40,16 +41,26 @@ export default function Home () {
   }
 
   if (!network) return <UnsupportedChain/>
-  if (isLoading) return <LinearProgress/>
-  if (!isLoading && !lastSold.length && !lastListed.length) return <h1>No NFTs for sale</h1>
+  // if (isLoading) return <LinearProgress/>
+  // if (!isLoading && !lastSold.length && !lastListed.length) return 
+  //   <h1>No NFTs for sale</h1>
   return (
     <>
+    {/* <Card>
+    <img style={{maxWidth:'600px'}} src={img1.src}></img>
+    </Card> */}
+    <Card>
     <h1>Total sold</h1>
     <p>{totalSold}</p>
+    </Card>
+    <Card>
     <h1>Last sold</h1>
     <NFTCardList nfts={lastSold} setNfts={setLastSold} withCreateNFT={false}/>
+    </Card>
+    <Card>
     <h1>Last listed</h1>
     <NFTCardList nfts={lastListed} setNfts={setLastListed} withCreateNFT={false}/>
+    </Card>
     </>
   )
 }
