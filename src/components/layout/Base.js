@@ -38,10 +38,10 @@ export default function BaseLayout({ children }) {
         <DesktopOutlined />
         <span><Link href='/marketplace'>Marketplace</Link></span>
       </Menu.Item>
-      <Menu.Item style={{ borderRadius: "0px" }} key="4">
+      {/* <Menu.Item style={{ borderRadius: "0px" }} key="4">
         <DesktopOutlined />
         <span><Link href='/staking'>Staking</Link></span>
-      </Menu.Item>
+      </Menu.Item> */}
     </Menu>
 
   }

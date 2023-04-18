@@ -9,33 +9,16 @@ import { Row, Switch } from 'antd'
 export default function Marketplace() {
   const [nfts, setNfts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
-  const { marketplaceContract, CardNftContract, SoldierNftContract, MaterialNftContract, account, isReady, network } = useContext(Web3Context)
-
-  const [collectionFilter, setCollectionFilter] = useState({
-    soldier: true,
-    material: true,
-    card: true
-  })
+  const { marketplaceContract, account, isReady, network } = useContext(Web3Context)
 
   useEffect(() => {
     loadNFTs()
-  }, [account, isReady, collectionFilter])
+  }, [account, isReady])
 
   async function loadNFTs() {
     if (!isReady) return
-    const data = await marketplaceContract.fetchAvailableMarketItems()
-    var items1 = []
-    var items2 = []
-    var items3 = []
-    if (collectionFilter.soldier)
-      items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
-    if (collectionFilter.material)
-      items2 = await Promise.all(data.map(mapAvailableMarketItems(MaterialNftContract)))
-    if (collectionFilter.card)
-      items3 = await Promise.all(data.map(mapAvailableMarketItems(CardNftContract)))
-    var final = []
-    final = final.concat(items1, items2, items3)
-    console.log(final)
+    const data = await marketplaceContract.getAvailableMarketItems()
+    var final = await Promise.all(data.map(mapAvailableMarketItems(process.env["NFT_ADDRESS"])))
     final.sort((x) => x.marketItemId)
     setNfts(final)
     setIsLoading(false)
@@ -46,26 +29,6 @@ export default function Marketplace() {
   if (!isLoading && !nfts.length) return <h1>No NFTs for sale</h1>
   return (
     <>
-      <Row>
-        <p>Soldier <Switch defaultChecked onChange={() => {
-          setCollectionFilter(current => ({
-            ...current,
-            soldier: !collectionFilter.soldier
-          }))
-        }} /></p>
-        <p>Material <Switch defaultChecked onChange={() => {
-          setCollectionFilter(current => ({
-            ...current,
-            material: !collectionFilter.material
-          }))
-        }} /></p>
-        <p>Card <Switch defaultChecked onChange={() => {
-          setCollectionFilter(current => ({
-            ...current,
-            card: !collectionFilter.card
-          }))
-        }} /></p>
-      </Row>
       <NFTCardList nfts={nfts} setNfts={setNfts} withCreateNFT={false} />
     </>
   )

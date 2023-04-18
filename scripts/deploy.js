@@ -2,14 +2,11 @@ const hre = require('hardhat')
 const dotenv = require('dotenv')
 const fs = require('fs')
 
-function replaceEnvContractAddresses (marketplaceAddress, soldier,material,card,stake, networkName) {
+function replaceEnvContractAddresses (marketplaceAddress,stake, networkName) {
   const envFileName = '.env.local'
   const envFile = fs.readFileSync(envFileName, 'utf-8')
   const env = dotenv.parse(envFile)
   env[`MARKETPLACE_CONTRACT_ADDRESS_${networkName}`] = marketplaceAddress
-  env[`SOLDIER_CONTRACT_ADDRESS_${networkName}`] = soldier
-  env[`MATERIAL_CONTRACT_ADDRESS_${networkName}`] = material
-  env[`CARD_CONTRACT_ADDRESS_${networkName}`] = card
   env[`STAKER_CONTRACT_ADDRESS_${networkName}`] = stake
   const newEnv = Object.entries(env).reduce((env, [key, value]) => {
     return `${env}${key}=${value}\n`
@@ -25,30 +22,15 @@ async function main () {
   await marketplace.deployed()
   console.log('Marketplace deployed to:', marketplace.address)
 
-  const HappywarSoldier = await hre.ethers.getContractFactory('HappywarSoldier')
-  const soldier = await HappywarSoldier.deploy(marketplace.address)
-  await soldier.deployed()
-  console.log('Soldier Nft deployed to:', soldier.address)
-
-  const HappywarMaterial = await hre.ethers.getContractFactory('HappywarMaterial')
-  const material = await HappywarMaterial.deploy(marketplace.address)
-  await material.deployed()
-  console.log('Material Nft deployed to:', material.address)
-
   const Staking = await hre.ethers.getContractFactory('Staking')
   const Happy = await hre.ethers.getContractFactory('Happy')
   const happy = await Happy.deploy("Happy","HAPPY")
   await happy.deployed()
   console.log('$HAPPY deployed to:',happy.address)
-  const staking = await Staking.deploy(material.address,happy.address)
+  const staking = await Staking.deploy(process.env.NFT_ADDRESS,happy.address)
   await staking.deployed()
 
-  const CardMaterial = await hre.ethers.getContractFactory('HappywarMaterial')
-  const card = await CardMaterial.deploy(marketplace.address)
-  await card.deployed()
-  console.log('Card Nft deployed to:', card.address)
-
-  replaceEnvContractAddresses(marketplace.address, soldier.address, material.address,card.address, staking.address,hre.network.name.toUpperCase())
+  replaceEnvContractAddresses(marketplace.address,staking.address,hre.network.name.toUpperCase())
 }
 
 main()

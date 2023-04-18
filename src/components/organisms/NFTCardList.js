@@ -27,45 +27,26 @@ const useStyles = makeStyles((theme) => ({
 
 export default function NFTCardList({ nfts, setNfts, withCreateNFT, withStaker = false, withStaker2 = false }) {
   const classes = useStyles()
-  const { account, StakerContract, CardNftContract, marketplaceContract, SoldierNftContract, MaterialNftContract } = useContext(Web3Context)
+  const { account, marketplaceContract } = useContext(Web3Context)
 
   async function updateNFT(index, tokenId) {
-    var updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)(tokenId)
+    var updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, process.env["NFT_CONTRACT"], account)(tokenId)
     if (updatedNFt != undefined) {
       setNfts(prevNfts => {
         const updatedNfts = [...prevNfts]
         updatedNfts[index] = updatedNFt
-      })
-    }
-    updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)(tokenId)
-    if (updatedNFt != undefined) {
-      setNfts(prevNfts => {
-        const updatedNfts = [...prevNfts]
-        updatedNfts[index] = updatedNFt
-        return updatedNfts
-      })
-    }
-    updatedNFt = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, CardNftContract, account)(tokenId)
-    if (updatedNFt != undefined) {
-      setNfts(prevNfts => {
-        const updatedNfts = [...prevNfts]
-        updatedNfts[index] = updatedNFt
-        return updatedNfts
       })
     }
   }
 
   async function addNFTToList(tokenId) {
-    var nft = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)(tokenId)
-    setNfts(prevNfts => [...prevNfts, nft])
-    nft = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)(tokenId)
-    setNfts(prevNfts => [...prevNfts, nft])
-    nft = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, CardNftContract, account)(tokenId)
+    var nft = await mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, process.env["NFT_CONTRACT"], account)(tokenId)
     setNfts(prevNfts => [...prevNfts, nft])
   }
 
   function NFT({ nft, index }) {
     if (nft != undefined) {
+      console.log(nft)
       if (withStaker) {
         return <NFTCard nft={nft} action="stake" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
@@ -78,19 +59,20 @@ export default function NFTCardList({ nfts, setNfts, withCreateNFT, withStaker =
         return <NFTCardCreation addNFTToList={addNFTToList} />
       }
 
-      else if (nft.owner === account && nft.marketItemId && !nft.hasMarketApproval) {
-        return <NFTCard nft={nft} action="approve" updateNFT={() => updateNFT(index, nft.tokenId)} />
+      // else if (nft.owner === account && nft.marketItemId) {
+      //   return <NFTCard nft={nft} action="approve" updateNFT={() => updateNFT(index, nft.tokenId)} />
+      // }
+      
+      else if (nft.seller === account && !nft.sold) {
+        return <NFTCard nft={nft} action="cancel" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
-
+      
       else if (nft.owner === account) {
         return <NFTCard nft={nft} action="sell" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
 
-      else if (nft.seller === account && !nft.sold) {
-        return <NFTCard nft={nft} action="cancel" updateNFT={() => updateNFT(index, nft.tokenId)} />
-      }
 
-      else if (nft.owner === ethers.constants.AddressZero) {
+      else if (nft.seller !== account && !nft.sold) {
         return <NFTCard nft={nft} action="buy" updateNFT={() => updateNFT(index, nft.tokenId)} />
       }
 

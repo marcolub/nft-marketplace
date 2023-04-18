@@ -8,6 +8,7 @@ import { Web3Context } from '../src/components/providers/Web3Provider'
 import { Table, Row } from 'antd'
 import axios from 'axios'
 import { useRouter } from 'next/router';
+import { getTransactionsHistory, getTokenMetadataByTokenId } from '../src/utils/nft'
 
 const useStyles = makeStyles({
     root: {
@@ -54,13 +55,13 @@ const useStyles = makeStyles({
 
 async function getAndSetListingFee(marketplaceContract, setListingFee) {
     if (!marketplaceContract) return
-    const listingFee = await marketplaceContract.getListingFee()
+    const listingFee = await marketplaceContract.marketplaceFee()
     setListingFee(ethers.utils.formatUnits(listingFee, 'ether'))
 }
 
 export default function Details({ }) {
     const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
-    const { account, CardNftContract,marketplaceContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
+    const { account, marketplaceContract, isReady, hasWeb3, network } = useContext(Web3Context)
     const [metadata, setMetadata] = useState({})
     const [data, setData] = useState([])
     const [traits, setTraits] = useState([])
@@ -76,27 +77,24 @@ export default function Details({ }) {
 
     const router = useRouter();
     const { name, description, tokenId, image } = router.query
-    var nftContract = ''
-    if (name != undefined) {
-        if (name.startsWith('Soldier')) nftContract = SoldierNftContract
-        if (name.startsWith('Material')) nftContract = MaterialNftContract
-        if (name.startsWith('Card')) nftContract = CardNftContract
-    }
+
     useEffect(() => {
         getAndSetListingFee(marketplaceContract, setListingFee)
         fetchdata()
         fetchTable()
-        console.log(nftContract)
     }, [account, isReady])
 
     useEffect(() => {
         SETmyresultarray([])
-        Object.entries(metadata).map(([key, val]) => {
-            if (key == 'image') SETmyresultcoverimage(val.replace('ipfs://', 'https://gateway.ipfs.io/ipfs/'))
-            else if (key == 'attributes'){setTraits(val)
-                 console.log(traits)}
-            else SETmyresultarray(current => [...current, val])
-        })
+        if (metadata !== undefined) {
+            Object.entries(metadata).map(([key, val]) => {
+                if (key == 'image') SETmyresultcoverimage(val.replace('ipfs://', 'https://gateway.ipfs.io/ipfs/'))
+                else if (key == 'attributes') {
+                    setTraits(val)
+                }
+                else SETmyresultarray(current => [...current, val])
+            })
+        }
     }, [metadata, traits]);
 
     const columns = [
@@ -123,42 +121,37 @@ export default function Details({ }) {
     ];
 
     const fetchTable = async () => {
-        if (nftContract != null) {
-            setData([])
-            const resp = await axios.get(`https://api.covalenthq.com/v1/80001/tokens/${nftContract.address}/nft_transactions/${tokenId}/?key=ckey_ccf942cdee9b4cd6b223e2d5767`)
 
-            console.log(resp.data.data.items[0].nft_transactions)
-            resp.data.data.items[0].nft_transactions.forEach((value) => {
-                var tempevent = ''
-                if (value.value == 45000000000000000) {
-                    tempevent = 'list'
-                }
-                else if (value.value != 0) {
-                    tempevent = 'sell'
-                }
-                const tempprice = value.value == 0 ? '-' : `${value.value}`
-                var temp = {
-                    from_address: value.from_address,
-                    to_address: value.to_address,
-                    event: tempevent,
-                    price: tempprice,
-                }
-                setData(current => [...current, temp])
-            })
-        }
+        setData([])
+        const resp = await getTransactionsHistory(process.env["NFT_ADDRESS"], tokenId);
+        console.log(resp);
+        resp.forEach((tx) => {
+            var tempevent = ''
+            if(tx.from == ethers.constants.AddressZero){
+                tempevent = 'mint'
+            }
+            else if (tx.value == listingFee) {
+                tempevent = 'list'
+            }
+            else if (tx.value > 0) {
+                tempevent = 'sell'
+            }
+            const tempprice = tx.value == 0 || tx.value == null ? '-' : `${tx.value}`
+            var temp = {
+                from_address: tx.from,
+                to_address: tx.to,
+                event: tempevent,
+                price: tempprice,
+            }
+            setData(current => [...current, temp])
+        })
+
     }
 
 
-    const fetchdata = () => {
-        if (nftContract != null) {
-            axios.get(`https://api.covalenthq.com/v1/80001/tokens/${nftContract.address}/nft_metadata/${tokenId}/?key=ckey_ccf942cdee9b4cd6b223e2d5767`)
-                .then(resp => {
-                    const url = resp.data.data.items[0].nft_data[0].token_url
-                    axios.get(url).then(resp2 => {
-                        setMetadata(resp2.data)
-                    });
-                });
-        }
+    const fetchdata = async () => {
+        const result = await getTokenMetadataByTokenId(process.env["NFT_ADDRESS"], tokenId);
+        setMetadata(result);
     }
 
     return (
@@ -167,10 +160,10 @@ export default function Details({ }) {
                 <img style={{ width: '512px', height: '512px' }} src={image}></img>
                 <Divider className={classes.firstDivider} />
                 <div>
-                
-                    {traits.map((value,i) => {
-                        return <div style={{ paddingLeft: '10%' }} key={value.value}>
-                            <h2><a>{value.trait_type}</a></h2><h2> {value.value}</h2>
+
+                    {traits.map((trait, i) => {
+                        return <div style={{ paddingLeft: '10%' }} key={trait.value}>
+                            <h2><a>{trait.trait_type}</a></h2><h2> {trait.value}</h2>
                         </div>
                     })}
                 </div>

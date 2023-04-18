@@ -30,6 +30,7 @@
     "@nomiclabs/hardhat-ethers": "^2.0.4",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
     "@openzeppelin/contracts": "^4.4.2",
+    "alchemy-sdk": "^2.8.0",
     "ant-design-pro": "^2.3.2",
     "antd": "^5.1.1",
     "axios": "^0.24.0",

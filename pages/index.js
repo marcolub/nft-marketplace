@@ -6,6 +6,15 @@ import UnsupportedChain from '../src/components/molecules/UnsupportedChain'
 import { mapAvailableMarketItems } from '../src/utils/nft'
 import { Card, CardActions, CardContent, CardMedia, Button, Divider, Box, CircularProgress } from '@mui/material'
 
+import { Alchemy, Network } from 'alchemy-sdk';
+
+const settings = {
+  apiKey: process.env["ALCHEMY_KEY"], 
+  network: Network.MATIC_MUMBAI
+};
+
+const alchemy = new Alchemy(settings);
+
 export default function Home () {
   const [nfts, setNfts] = useState([])
   const [isLoading, setIsLoading] = useState(true)
@@ -21,21 +30,14 @@ export default function Home () {
 
   async function loadNFTs () {
     if (!isReady) return
-    var data = await marketplaceContract.fetchAvailableMarketItems()
-    var items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
-    var items2 = await Promise.all(data.map(mapAvailableMarketItems(MaterialNftContract)))
-    var items3 = await Promise.all(data.map(mapAvailableMarketItems(CardNftContract)))
-    var items = items1.concat(items2).concat(items3)
+    var data = await marketplaceContract.getAvailableMarketItems()
+    var items = await Promise.all(data.map(mapAvailableMarketItems(process.env["NFT_ADDRESS"])))
     const listed = items.filter((x)=> x!== undefined).sort(function(a,b){return b-a})
     setLastListed(listed.slice(0,5))
-    data = await marketplaceContract.fetchSoldMarketItems()
-    items1 = await Promise.all(data.map(mapAvailableMarketItems(SoldierNftContract)))
-    items2 = await Promise.all(data.map(mapAvailableMarketItems(MaterialNftContract)))
-    items3 = await Promise.all(data.map(mapAvailableMarketItems(CardNftContract)))
-    items = items1.concat(items2).concat(items3)
+    data = await marketplaceContract.getSoldMarketItems()
+    items = await Promise.all(data.map(mapAvailableMarketItems(process.env["NFT_ADDRESS"])))
     const sold = items.filter((x)=> x!== undefined).sort(function(a, b){return b-a})
     setTotalSold(sold.length)
-    console.log(sold)
     setLastSold(sold.slice(0,5))
     setIsLoading(false)
   }

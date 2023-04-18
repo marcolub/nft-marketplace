@@ -58,13 +58,13 @@ const useStyles = makeStyles({
 
 async function getAndSetListingFee(marketplaceContract, setListingFee) {
   if (!marketplaceContract) return
-  const listingFee = await marketplaceContract.getListingFee()
+  const listingFee = await marketplaceContract.marketplaceFee()
   setListingFee(ethers.utils.formatUnits(listingFee, 'ether'))
 }
 
 const NFTCard = ({ nft, action, updateNFT }) => {
   const { setModalNFT, setIsModalOpen } = useContext(NFTModalContext)
-  const { StakerContract,CardNftContract, SoldierNftContract, MaterialNftContract, marketplaceContract, hasWeb3 } = useContext(Web3Context)
+  const { stakerContract,marketplaceContract, hasWeb3 } = useContext(Web3Context)
   const [isHovered, setIsHovered] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [listingFee, setListingFee] = useState('')
@@ -73,12 +73,11 @@ const NFTCard = ({ nft, action, updateNFT }) => {
   const classes = useStyles()
   const { name, description, image } = nft
 
-  var nftContract = ''
-  if (name != undefined) {
-    if (name.startsWith('Soldier')) nftContract = SoldierNftContract
-    if (name.startsWith('Material')) nftContract = MaterialNftContract
-    if (name.startsWith('Card')) nftContract = CardNftContract
-  }
+  // if (name != undefined) {
+  //   if (name.startsWith('Soldier')) nftContract = SoldierNftContract
+  //   if (name.startsWith('Material')) nftContract = MaterialNftContract
+  //   if (name.startsWith('Card')) nftContract = CardNftContract
+  // }
   const router = useRouter();
 
   useEffect(() => {
@@ -102,10 +101,10 @@ const NFTCard = ({ nft, action, updateNFT }) => {
       text: 'cancel',
       method: cancelNft
     },
-    approve: {
-      text: 'Approve for selling',
-      method: approveNft
-    },
+    // approve: {
+    //   text: 'Approve for selling',
+    //   method: approveNft
+    // },
     sell: {
       text: listingFee ? `Sell (${listingFee} fee)` : 'Sell',
       method: sellNft
@@ -117,35 +116,31 @@ const NFTCard = ({ nft, action, updateNFT }) => {
   }
 
   async function unstakeNft(nft) {
-    await StakerContract.withdraw([nft.tokenId])
+    await stakerContract.withdraw([nft.tokenId])
   }
 
   async function stakeNft(nft){
-    const res = await StakerContract.stake([nft.tokenId])
-    console.log(res)
+    await stakerContract.stake([nft.tokenId])
   }
 
   async function buyNft(nft) {
-    const price = ethers.utils.parseUnits(nft.price.toString(), 'ether')
-    const transaction = await marketplaceContract.createMarketSale(nftContract.address, nft.marketItemId, {
-      value: price
-    })
-    await transaction.wait()
+    const sellId = await marketplaceContract.sellIdfromTokenId(nft.tokenId);
+    await marketplaceContract.buyListToken(sellId);
     updateNFT()
   }
 
   async function cancelNft(nft) {
-    const transaction = await marketplaceContract.cancelMarketItem(nftContract.address, nft.marketItemId)
-    await transaction.wait()
+    const sellId = await marketplaceContract.sellIdfromTokenId(nft.tokenId);
+    await marketplaceContract.cancelList(sellId);
     updateNFT()
   }
 
-  async function approveNft(nft) {
-    const approveTx = await nftContract.approve(marketplaceContract.address, nft.tokenId)
-    await approveTx.wait()
-    updateNFT()
-    return approveTx
-  }
+  // async function approveNft(nft) {
+  //   const approveTx = await nftContract.approve(marketplaceContract.address, nft.tokenId)
+  //   await approveTx.wait()
+  //   updateNFT()
+  //   return approveTx
+  // }
 
   async function sellNft(nft) {
     if (!newPrice) {
@@ -153,23 +148,20 @@ const NFTCard = ({ nft, action, updateNFT }) => {
       return
     }
     setPriceError(false)
-    const listingFee = await marketplaceContract.getListingFee()
+    const listingFee = await marketplaceContract.marketplaceFee()
     const priceInWei = ethers.utils.parseUnits(newPrice, 'ether')
-    var transaction = undefined
-    if (name.startsWith('Soldier'))
-      transaction = await marketplaceContract.createMarketItemSoldier(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
-    if (name.startsWith('Material'))
-      transaction = await marketplaceContract.createMarketItemMaterial(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
-    if (name.startsWith('Card'))
-      transaction = await marketplaceContract.createMarketItemCard(nftContract.address, nft.tokenId, priceInWei, { value: listingFee.toString() })
-    await transaction.wait()
+    
+    await marketplaceContract.createList(
+      process.env["NFT_ADDRESS"],
+      nft.tokenId,
+      86400,
+      priceInWei
+    )
+
     updateNFT()
-    return transaction
   }
 
   function handleCardImageClick() {
-    // setModalNFT(nft)
-    // setIsModalOpen(true)
     router.push({
       pathname: '/details',
       query: {

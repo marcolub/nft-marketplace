@@ -32,7 +32,7 @@ async function setupMarket (marketplaceAddress, nftAddress) {
   const [acc1, acc2] = await hre.ethers.getSigners()
 
   const price = hre.ethers.utils.parseEther('0.01')
-  const listingFee = await marketplaceContract.getListingFee()
+  const listingFee = await marketplaceContract.marketplaceFee()
 
   const dogsMintTx = await nftContract.mintToken(dogsMetadataUrl)
   const dogsTokenId = await getMintedTokenId(dogsMintTx)

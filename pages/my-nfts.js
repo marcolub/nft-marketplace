@@ -9,8 +9,7 @@ import ConnectWalletMessage from '../src/components/molecules/ConnectWalletMessa
 
 export default function CreatorDashboard() {
   const [nfts, setNfts] = useState([])
-  const [temp, setTemp] = useState([])
-  const { account, marketplaceContract, CardNftContract, SoldierNftContract, MaterialNftContract, isReady, hasWeb3, network } = useContext(Web3Context)
+  const { account, marketplaceContract, isReady, hasWeb3, network } = useContext(Web3Context)
   const [isLoading, setIsLoading] = useState(true)
   const [hasWindowEthereum, setHasWindowEthereum] = useState(false)
 
@@ -24,19 +23,13 @@ export default function CreatorDashboard() {
 
   async function loadNFTs() {
     if (!isReady || !hasWeb3) return <></>
-    var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(SoldierNftContract)
-    var myNfts1 = await Promise.all(
+    var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(account,process.env.NFT_ADDRESS)
+    var myNfts = await Promise.all(
       myUniqueCreatedAndOwnedTokenIds.map(
-        mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, SoldierNftContract, account)
-      ))
-    var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(MaterialNftContract)
-    var myNfts2 = await Promise.all(myUniqueCreatedAndOwnedTokenIds.map(
-      mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, MaterialNftContract, account)))
-    var myUniqueCreatedAndOwnedTokenIds = await getUniqueOwnedAndCreatedTokenIds(CardNftContract)
-    var myNfts3 = await Promise.all(myUniqueCreatedAndOwnedTokenIds.map(
-      mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, CardNftContract, account)))
-    const myNfts = myNfts1.concat(myNfts2).concat(myNfts3)
+        mapCreatedAndOwnedTokenIdsAsMarketItems(marketplaceContract, process.env.NFT_ADDRESS, account)
+      ));
     myNfts.sort((x)=>x.marketItemId)
+
     setNfts(myNfts)
     setIsLoading(false)
   }
@@ -47,6 +40,6 @@ export default function CreatorDashboard() {
   if (isLoading) return <LinearProgress />
 
   return (
-    <NFTCardList nfts={nfts} setNfts={setNfts} withCreateNFT={true} />
+    <NFTCardList nfts={nfts} setNfts={setNfts} withCreateNFT={false} />
   )
 }
